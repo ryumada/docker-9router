@@ -1,0 +1,13 @@
+services:
+  9router:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${PORT:-20128}:20128"
+    volumes:
+      - ./data:/home/node/.9router
+    environment:
+      - "NODE_ENV=production"
+      # Optional: set initial admin password or JWT secret
+      - INITIAL_PASSWORD=${INITIAL_PASSWORD:-}
+      # - JWT_SECRET=${JWT_SECRET:-}
