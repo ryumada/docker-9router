@@ -1,0 +1,58 @@
+# 1. Alihkan semua trafik HTTP (Port 80) ke HTTPS
+server {
+    listen 80;
+    server_name $DOMAIN;
+    return 301 https://$host$request_uri;
+}
+
+# 2. Blok Utama HTTPS (Port 443)
+server {
+    listen 443 ssl http2;
+    server_name $DOMAIN;
+
+    # Jalur file sertifikat SSL Anda
+    ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem;
+
+    # Optimasi Keamanan SSL (Protokol & Cipher Modern)
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384';
+
+    # Session Cache untuk meningkatkan performa
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    # Keamanan Tambahan
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    # Blokir akses ke file tersembunyi
+    location ~ /\. {
+        deny all;
+    }
+
+    # Proxy ke container 9Router custom Anda
+    location / {
+        proxy_pass http://127.0.0.1:20128;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        # Sangat penting: beri tahu 9Router bahwa koneksi menggunakan HTTPS
+        proxy_set_header X-Forwarded-Proto https;
+
+        # Konfigurasi WebSockets
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        # Timeout manajemen
+        proxy_connect_timeout 60s;
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 60s;
+    }
+}
