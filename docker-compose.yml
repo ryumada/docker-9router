@@ -1,6 +1,10 @@
 services:
   9router:
-    build: .
+    build:
+      context: .
+      args:
+        NODE_USER_UID: ${NODE_USER_UID:-1000}
+        NODE_USER_GID: ${NODE_USER_GID:-1000}
     restart: unless-stopped
     ports:
       - "${PORT:-20128}:20128"

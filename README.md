@@ -26,11 +26,13 @@ Docker containerization for [9router](https://www.npmjs.com/package/9router), pr
    cd docker-9router
    ```
 
-2. **Configure environment variables:**
+2. **Run the setup script (recommended):**
    ```bash
-   cp .env.example .env
+   ./setup.sh
    ```
-   Edit `.env` according to your preferences:
+   *This automatically creates `.env` from `.env.example` and synchronizes `NODE_USER_UID` and `NODE_USER_GID` with your host user, preventing file permission errors on `./data`.*
+
+   You can also edit `.env` manually according to your preferences:
    ```dotenv
    # Port to expose (default: 20128)
    PORT=20128
@@ -62,6 +64,8 @@ The following environment variables can be configured in your `.env` file:
 | `PORT` | Host port mapped to the 9router service | `20128` |
 | `INITIAL_PASSWORD` | Pre-configured admin password for initial setup | *(empty)* |
 | `JWT_SECRET` | Secret key for JWT authentication (optional) | *(empty)* |
+| `NODE_USER_UID` | Host user ID for container file permissions (auto-set by `setup.sh`) | `1000` |
+| `NODE_USER_GID` | Host group ID for container file permissions (auto-set by `setup.sh`) | `1000` |
 
 ---
 
@@ -75,6 +79,7 @@ docker-9router/
 ├── Dockerfile         # Container build recipe
 ├── LICENSE            # MIT License
 ├── README.md          # Project documentation
+├── setup.sh           # Environment setup & UID sync script
 └── data/              # Persistent data volume for 9router
 ```
 
