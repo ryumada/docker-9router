@@ -4,7 +4,7 @@ Docker containerization for [9router](https://www.npmjs.com/package/9router), pr
 
 ## 🚀 Features
 
-- **Lightweight**: Based on Node 24 Alpine.
+- **Lightweight**: Based on Node 24 Slim.
 - **Persistent Storage**: Configuration and data stored in `./data` (`/home/node/.9router`).
 - **Configurable**: Easily configure ports and initial setup via `.env`.
 - **Non-root Execution**: Runs as non-root `node` user inside the container for better security.
